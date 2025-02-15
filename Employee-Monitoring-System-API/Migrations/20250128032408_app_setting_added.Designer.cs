@@ -3,6 +3,7 @@ using System;
 using Employee_Monitoring_System_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Employee_Monitoring_System_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250128032408_app_setting_added")]
+    partial class app_setting_added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,8 +35,7 @@ namespace Employee_Monitoring_System_API.Migrations
 
                     b.Property<string>("ActiveApplication")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
@@ -54,8 +56,7 @@ namespace Employee_Monitoring_System_API.Migrations
             modelBuilder.Entity("Employee_Monitoring_System_API.Models.AppSettings", b =>
                 {
                     b.Property<string>("SettingKey")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SettingValue")
                         .IsRequired()
@@ -68,11 +69,9 @@ namespace Employee_Monitoring_System_API.Migrations
 
             modelBuilder.Entity("Employee_Monitoring_System_API.Models.Branch", b =>
                 {
-                    b.Property<int>("BranchId")
+                    b.Property<Guid>("BranchId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BranchId"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("BranchName")
                         .IsRequired()
@@ -124,12 +123,10 @@ namespace Employee_Monitoring_System_API.Migrations
 
                     b.Property<string>("LeaveType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Remarks")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("timestamp with time zone");
@@ -165,8 +162,7 @@ namespace Employee_Monitoring_System_API.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
@@ -183,14 +179,12 @@ namespace Employee_Monitoring_System_API.Migrations
 
             modelBuilder.Entity("Employee_Monitoring_System_API.Models.Project", b =>
                 {
-                    b.Property<int>("ProjectId")
+                    b.Property<Guid>("ProjectId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProjectId"));
-
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("BranchId")
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("CompletionPercentage")
                         .HasColumnType("integer");
@@ -228,20 +222,16 @@ namespace Employee_Monitoring_System_API.Migrations
 
             modelBuilder.Entity("Employee_Monitoring_System_API.Models.Screenshot", b =>
                 {
-                    b.Property<int>("ScreenshotId")
+                    b.Property<Guid>("ScreenshotId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ScreenshotId"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
@@ -264,8 +254,8 @@ namespace Employee_Monitoring_System_API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("BranchId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp with time zone");
@@ -318,8 +308,7 @@ namespace Employee_Monitoring_System_API.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");
@@ -329,8 +318,8 @@ namespace Employee_Monitoring_System_API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -362,7 +351,8 @@ namespace Employee_Monitoring_System_API.Migrations
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
                         .WithMany("ActivityLogs")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -382,7 +372,8 @@ namespace Employee_Monitoring_System_API.Migrations
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
                         .WithMany("LeaveRequests")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -390,9 +381,10 @@ namespace Employee_Monitoring_System_API.Migrations
             modelBuilder.Entity("Employee_Monitoring_System_API.Models.Notification", b =>
                 {
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
-                        .WithMany("Notifications")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -417,7 +409,8 @@ namespace Employee_Monitoring_System_API.Migrations
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
                         .WithMany("Screenshots")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -434,14 +427,16 @@ namespace Employee_Monitoring_System_API.Migrations
             modelBuilder.Entity("Employee_Monitoring_System_API.Models._Task", b =>
                 {
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "AssignedUser")
-                        .WithMany("Tasks")
+                        .WithMany()
                         .HasForeignKey("AssignedTo")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Employee_Monitoring_System_API.Models.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AssignedUser");
 
@@ -466,11 +461,7 @@ namespace Employee_Monitoring_System_API.Migrations
 
                     b.Navigation("LeaveRequests");
 
-                    b.Navigation("Notifications");
-
                     b.Navigation("Screenshots");
-
-                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,6 +3,7 @@ using System;
 using Employee_Monitoring_System_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Employee_Monitoring_System_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250214161704_UpdateModelsToIntIds")]
+    partial class UpdateModelsToIntIds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -362,7 +365,8 @@ namespace Employee_Monitoring_System_API.Migrations
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
                         .WithMany("ActivityLogs")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -382,7 +386,8 @@ namespace Employee_Monitoring_System_API.Migrations
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
                         .WithMany("LeaveRequests")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -390,9 +395,10 @@ namespace Employee_Monitoring_System_API.Migrations
             modelBuilder.Entity("Employee_Monitoring_System_API.Models.Notification", b =>
                 {
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
-                        .WithMany("Notifications")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -417,7 +423,8 @@ namespace Employee_Monitoring_System_API.Migrations
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "User")
                         .WithMany("Screenshots")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -434,14 +441,16 @@ namespace Employee_Monitoring_System_API.Migrations
             modelBuilder.Entity("Employee_Monitoring_System_API.Models._Task", b =>
                 {
                     b.HasOne("Employee_Monitoring_System_API.Models.User", "AssignedUser")
-                        .WithMany("Tasks")
+                        .WithMany()
                         .HasForeignKey("AssignedTo")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Employee_Monitoring_System_API.Models.Project", "Project")
                         .WithMany("Tasks")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AssignedUser");
 
@@ -466,11 +475,7 @@ namespace Employee_Monitoring_System_API.Migrations
 
                     b.Navigation("LeaveRequests");
 
-                    b.Navigation("Notifications");
-
                     b.Navigation("Screenshots");
-
-                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }
