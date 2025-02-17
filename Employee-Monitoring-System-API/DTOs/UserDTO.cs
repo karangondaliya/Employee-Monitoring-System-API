@@ -10,6 +10,6 @@
         public string? BranchName { get; set; }
         public bool IsActive { get; set; }
         public string? PhoneNumber { get; set; }
-        public DateTime? LastLogin { get; set; }
+        public DateTime? LastLogin { get; set; } = DateTime.UtcNow;
     }
 }

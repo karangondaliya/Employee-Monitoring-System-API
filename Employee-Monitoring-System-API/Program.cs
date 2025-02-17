@@ -2,6 +2,8 @@ using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using Employee_Monitoring_System_API.Repository;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Employee_Monitoring_System_API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,7 @@ builder.Services.AddScoped<ILeaveRepository, LeaveRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<IAppsettingRepository, AppsettingRepository>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

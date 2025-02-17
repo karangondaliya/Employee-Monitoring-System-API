@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using AutoMapper;
+using Employee_Monitoring_System_API.DTOs;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -9,10 +11,12 @@ namespace Employee_Monitoring_System_API.Controllers
     public class ScreenshotsController : ControllerBase
     {
         private readonly IScreenshotRepository _screenshotRepository;
+        private readonly IMapper _mapper;
 
-        public ScreenshotsController(IScreenshotRepository screenshotRepository)
+        public ScreenshotsController(IScreenshotRepository screenshotRepository, IMapper mapper)
         {
             _screenshotRepository = screenshotRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Screenshots
@@ -20,7 +24,8 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<Screenshot>> GetScreenshots()
         {
             var ss = _screenshotRepository.GetAllScreenshots();
-            return Ok(ss);
+            var ssDTOs = _mapper.Map<IEnumerable<ScreenshotDTO>>(ss);
+            return Ok(ssDTOs);
         }
 
         // GET: api/Screenshots/5
