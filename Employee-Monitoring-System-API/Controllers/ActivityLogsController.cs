@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using AutoMapper;
+using Employee_Monitoring_System_API.DTOs;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -9,23 +11,25 @@ namespace Employee_Monitoring_System_API.Controllers
     public class ActivityLogsController : ControllerBase
     {
         private readonly IActivityRepository _ar;
-
-        public ActivityLogsController(IActivityRepository ar)
+        private readonly IMapper _mapper;
+        public ActivityLogsController(IActivityRepository ar, IMapper mapper)
         {
             _ar = ar;
+            _mapper = mapper;
         }
 
         // GET: api/ActivityLogs
         [HttpGet]
-        public ActionResult<IEnumerable<ActivityLog>> GetActivityLogs()
+        public ActionResult<IEnumerable<ActivityLogDTO>> GetActivityLogs()
         {
             var activityLog = _ar.GetAll();
-            return Ok(activityLog);
+            var activityLogDTO = _mapper.Map<ActivityLogDTO>(activityLog);
+            return Ok(activityLogDTO);
         }
 
         // GET: api/ActivityLogs/5
         [HttpGet("{id}")]
-        public ActionResult<ActivityLog> GetActivityLog(int id)
+        public ActionResult<ActivityLogDTO> GetActivityLog(int id)
         {
             var activityLog = _ar.GetById(id);
 
@@ -33,20 +37,20 @@ namespace Employee_Monitoring_System_API.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(activityLog);
+            var activityLogDTO = _mapper.Map<ActivityLogDTO>(activityLog);
+            return Ok(activityLogDTO);
         }
 
         // PUT: api/ActivityLogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public IActionResult PutActivityLog(int id, ActivityLog activityLog)
+        public IActionResult PutActivityLog(int id, ActivityLogDTO activityLogDTO)
         {
-            if (id != activityLog.LogId)
+            if (id != activityLogDTO.LogId)
             {
                 return BadRequest();
             }
-
+            var activityLog = _mapper.Map<ActivityLog>(activityLogDTO);
             _ar.Update(activityLog);
             return Ok();
         }
@@ -54,8 +58,9 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/ActivityLogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<ActivityLog> PostActivityLog(ActivityLog activityLog)
+        public ActionResult<ActivityLogDTO> PostActivityLog(ActivityLogDTO activityLogDTO)
         {
+            var activityLog = _mapper.Map<ActivityLog>(activityLogDTO);
             _ar.Add(activityLog);
             return Ok();
         }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using AutoMapper;
+using Employee_Monitoring_System_API.DTOs;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -9,23 +11,25 @@ namespace Employee_Monitoring_System_API.Controllers
     public class AppSettingsController : ControllerBase
     {
         private readonly IAppsettingRepository _asr;
-
-        public AppSettingsController(IAppsettingRepository asr)
+        private readonly IMapper _mapper;
+        public AppSettingsController(IAppsettingRepository asr, IMapper mapper)
         {
             _asr = asr;
+            _mapper = mapper;
         }
 
         // GET: api/AppSettings
         [HttpGet]
-        public ActionResult<IEnumerable<AppSettings>> GetAppSettings()
+        public ActionResult<IEnumerable<AppSettingDTO>> GetAppSettings()
         {
             var appSettings = _asr.GetAll();
-            return Ok(appSettings);
+            var appSettingsDTO = _mapper.Map<IEnumerable<AppSettingDTO>>(appSettings);
+            return Ok(appSettingsDTO);
         }
 
         // GET: api/AppSettings/5
         [HttpGet("{id}")]
-        public ActionResult<AppSettings> GetAppSettings(string id)
+        public ActionResult<AppSettingDTO> GetAppSettings(string id)
         {
             var appSettings = _asr.GetByKey(id);
 
@@ -33,20 +37,21 @@ namespace Employee_Monitoring_System_API.Controllers
             {
                 return NotFound();
             }
-
-            return Ok(appSettings);
+            var appSettingsDTO = _mapper.Map<AppSettingDTO>(appSettings);
+            return Ok(appSettingsDTO);
         }
 
         // PUT: api/AppSettings/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public IActionResult PutAppSettings(string id, AppSettings appSettings)
+        public IActionResult PutAppSettings(string id, AppSettingDTO appSettingDTO)
         {
-            if (id != appSettings.SettingKey)
+            if (id != appSettingDTO.SettingKey)
             {
                 return BadRequest();
             }
 
+            var appSettings = _mapper.Map<AppSettings>(appSettingDTO);
             _asr.Update(appSettings);
             return Ok();
         }
@@ -54,8 +59,9 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/AppSettings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<AppSettings> PostAppSettings(AppSettings appSettings)
+        public ActionResult PostAppSettings(AppSettingDTO appSettingsDTO)
         {
+            var appSettings = _mapper.Map<AppSettings>(appSettingsDTO);
             _asr.Add(appSettings);
             return Ok();
         }

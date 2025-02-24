@@ -21,7 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Screenshots
         [HttpGet]
-        public ActionResult<IEnumerable<Screenshot>> GetScreenshots()
+        public ActionResult<IEnumerable<ScreenshotDTO>> GetScreenshots()
         {
             var ss = _screenshotRepository.GetAllScreenshots();
             var ssDTOs = _mapper.Map<IEnumerable<ScreenshotDTO>>(ss);
@@ -30,7 +30,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Screenshots/5
         [HttpGet("{id}")]
-        public ActionResult<Screenshot> GetScreenshot(int id)
+        public ActionResult<ScreenshotDTO> GetScreenshot(int id)
         {
             var screenshot = _screenshotRepository.GetScreenshot(id);
 
@@ -38,21 +38,23 @@ namespace Employee_Monitoring_System_API.Controllers
             {
                 return NotFound();
             }
+            var screenshotDTO = _mapper.Map<ScreenshotDTO>(screenshot);
 
-            return Ok(screenshot);
+            return Ok(screenshotDTO);
         }
 
         // PUT: api/Screenshots/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public IActionResult PutScreenshot(int id, Screenshot screenshot)
+        public IActionResult PutScreenshot(int id, ScreenshotDTO screenshotDTO)
         {
-            if (id != screenshot.ScreenshotId)
+            if (id != screenshotDTO.ScreenshotId)
             {
                 return BadRequest();
             }
 
-            var updatedSs = _screenshotRepository.Update(screenshot);
+            var ss = _mapper.Map<Screenshot>(screenshotDTO);
+            var updatedSs = _screenshotRepository.Update(ss);
             if(updatedSs != null)
             {
                 return NotFound();
@@ -64,10 +66,13 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/Screenshots
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<Screenshot> PostScreenshot(Screenshot screenshot)
+        public ActionResult<Screenshot> PostScreenshot(ScreenshotDTO screenshotDTO)
         {
-            var addedSs = _screenshotRepository.Add(screenshot);    
-            return CreatedAtAction("GetScreenshot", new { id = addedSs.ScreenshotId }, addedSs);
+            var screenshot = _mapper.Map<Screenshot>(screenshotDTO);
+            var addedSs = _screenshotRepository.Add(screenshot);   
+            
+            var createdScreenshotDTO = _mapper.Map<ScreenshotDTO>(addedSs);
+            return CreatedAtAction(nameof(GetScreenshot), new { id = createdScreenshotDTO.ScreenshotId }, createdScreenshotDTO);
         }
 
         // DELETE: api/Screenshots/5

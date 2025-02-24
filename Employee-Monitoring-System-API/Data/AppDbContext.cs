@@ -72,7 +72,6 @@ namespace Employee_Monitoring_System_API.Data
         public DbSet<Screenshot> Screenshots { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-
         public DbSet<AppSettings> AppSettings { get; set; }
     }
 }

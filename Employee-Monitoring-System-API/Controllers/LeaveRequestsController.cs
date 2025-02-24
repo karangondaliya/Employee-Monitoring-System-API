@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using AutoMapper;
+using Employee_Monitoring_System_API.DTOs;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -9,23 +11,25 @@ namespace Employee_Monitoring_System_API.Controllers
     public class LeaveRequestsController : ControllerBase
     {
         private readonly ILeaveRepository _lr;
-
-        public LeaveRequestsController(ILeaveRepository lr)
+        private readonly IMapper _mapper;
+        public LeaveRequestsController(ILeaveRepository lr, IMapper mapper)
         {
             _lr = lr;
+            _mapper = mapper;
         }
 
         // GET: api/LeaveRequests
         [HttpGet]
-        public ActionResult<IEnumerable<LeaveRequest>> GetLeaveRequests()
+        public ActionResult<IEnumerable<LeaveRequestDTO>> GetLeaveRequests()
         {
             var LeaveRequests = _lr.GetAllLeaveRequests();
-            return Ok(LeaveRequests);
+            var LeaveRequestsDTO = _mapper.Map<IEnumerable<LeaveRequestDTO>>(LeaveRequests);
+            return Ok(LeaveRequestsDTO);
         }
 
         // GET: api/LeaveRequests/5
         [HttpGet("{id}")]
-        public ActionResult<LeaveRequest> GetLeaveRequest(int id)
+        public ActionResult<LeaveRequestDTO> GetLeaveRequest(int id)
         {
             var leaveRequest = _lr.GetLeaveRequest(id);
 
@@ -33,20 +37,21 @@ namespace Employee_Monitoring_System_API.Controllers
             {
                 return NotFound();
             }
-
+            var leaveRequestDTO = _mapper.Map<LeaveRequestDTO>(leaveRequest);
             return Ok(leaveRequest);
         }
 
         // PUT: api/LeaveRequests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public IActionResult PutLeaveRequest(int id, LeaveRequest leaveRequest)
+        public IActionResult PutLeaveRequest(int id, LeaveRequestDTO leaveRequestDTO)
         {
-            if (id != leaveRequest.LeaveRequestId)
+            if (id != leaveRequestDTO.LeaveRequestId)
             {
                 return BadRequest();
             }
 
+            var leaveRequest = _mapper.Map<LeaveRequest>(leaveRequestDTO);
             var updatedLeave = _lr.Update(leaveRequest);
             if(updatedLeave == null)
             {
@@ -58,10 +63,13 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/LeaveRequests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<LeaveRequest> PostLeaveRequest(LeaveRequest leaveRequest)
+        public ActionResult<LeaveRequestDTO> PostLeaveRequest(LeaveRequestDTO leaveRequestDTO)
         {
+            var leaveRequest = _mapper.Map<LeaveRequest>(leaveRequestDTO);
             var addedLeave = _lr.Add(leaveRequest);
-            return CreatedAtAction("GetLeaveRequest", new { id = addedLeave.LeaveRequestId }, addedLeave);
+
+            var createdlrDTO = _mapper.Map<LeaveRequestDTO>(addedLeave);
+            return CreatedAtAction(nameof(GetLeaveRequest), new { id = createdlrDTO.LeaveRequestId }, createdlrDTO);
         }
 
         // DELETE: api/LeaveRequests/5
