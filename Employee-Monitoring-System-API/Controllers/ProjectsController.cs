@@ -65,9 +65,8 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/Projects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<Project> PostProject(ProjectDTO projectDTO)
+        public ActionResult<Project> PostProject(Project project)
         {
-            var project = _mapper.Map<Project>(projectDTO);
             var addedProject = _pr.Add(project);
 
             var createdProjectDTO = _mapper.Map<ProjectDTO>(addedProject);

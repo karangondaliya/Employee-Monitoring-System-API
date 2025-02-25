@@ -10,5 +10,6 @@
         public string Status { get; set; }
         public string? Remark { get; set; }
         public DateTime RequestedDate { get; set; } = DateTime.UtcNow;
+        public int? ApproverId { get; set; }
     }
 }
