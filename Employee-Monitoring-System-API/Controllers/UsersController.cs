@@ -45,30 +45,28 @@ namespace Employee_Monitoring_System_API.Controllers
         }
 
         // PUT: api/Users/5
-        [HttpPut("{id}")]
-        public IActionResult PutUser(int id, UserDTO userDTO)
+        [HttpPatch("{id}")]
+        public IActionResult PatchUser(int id, User user)
         {
-            if (id != userDTO.Id)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            var user = _mapper.Map<User>(userDTO);
             var updatedUser = _userRepository.Update(user);
 
             if (updatedUser == null)
             {
                 return NotFound();
             }
-
-            return NoContent();
+            var updatedUserDTO = _mapper.Map<UserDTO>(updatedUser);
+            return Ok(updatedUserDTO);
         }
 
         // POST: api/Users
         [HttpPost]
-        public ActionResult<UserDTO> PostUser(UserDTO userDTO)
+        public ActionResult<UserDTO> PostUser(User user)
         {
-            var user = _mapper.Map<User>(userDTO);
             var addedUser = _userRepository.Add(user);
 
             var createdUserDTO = _mapper.Map<UserDTO>(addedUser);

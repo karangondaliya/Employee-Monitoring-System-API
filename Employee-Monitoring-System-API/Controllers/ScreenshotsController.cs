@@ -45,22 +45,21 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/Screenshots/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public IActionResult PutScreenshot(int id, ScreenshotDTO screenshotDTO)
+        [HttpPatch("{id}")]
+        public IActionResult PutScreenshot(int id, Screenshot screenshot)
         {
-            if (id != screenshotDTO.ScreenshotId)
+            if (id != screenshot.ScreenshotId)
             {
                 return BadRequest();
             }
 
-            var ss = _mapper.Map<Screenshot>(screenshotDTO);
-            var updatedSs = _screenshotRepository.Update(ss);
+            var updatedSs = _screenshotRepository.Update(screenshot);
             if(updatedSs != null)
             {
                 return NotFound();
             }
-
-            return NoContent();
+            var updatedSsDTO = _mapper.Map<ScreenshotDTO>(updatedSs);
+            return Ok(updatedSsDTO);
         }
 
         // POST: api/Screenshots
