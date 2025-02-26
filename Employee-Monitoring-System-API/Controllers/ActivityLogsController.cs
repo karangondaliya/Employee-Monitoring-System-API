@@ -22,9 +22,9 @@ namespace Employee_Monitoring_System_API.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<ActivityLogDTO>> GetActivityLogs()
         {
-            var activityLog = _ar.GetAll();
-            var activityLogDTO = _mapper.Map<ActivityLogDTO>(activityLog);
-            return Ok(activityLogDTO);
+            var activityLogs = _ar.GetAll();
+            var activityLogDTOs = _mapper.Map<IEnumerable<ActivityLogDTO>>(activityLogs);
+            return Ok(activityLogDTOs);
         }
 
         // GET: api/ActivityLogs/5

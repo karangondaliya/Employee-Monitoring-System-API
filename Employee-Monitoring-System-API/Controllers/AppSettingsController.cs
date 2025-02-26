@@ -20,16 +20,15 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/AppSettings
         [HttpGet]
-        public ActionResult<IEnumerable<AppSettingDTO>> GetAppSettings()
+        public ActionResult<IEnumerable<AppSettings>> GetAppSettings()
         {
             var appSettings = _asr.GetAll();
-            var appSettingsDTO = _mapper.Map<IEnumerable<AppSettingDTO>>(appSettings);
-            return Ok(appSettingsDTO);
+            return Ok(appSettings);
         }
 
         // GET: api/AppSettings/5
         [HttpGet("{id}")]
-        public ActionResult<AppSettingDTO> GetAppSettings(string id)
+        public ActionResult<AppSettings> GetAppSettings(string id)
         {
             var appSettings = _asr.GetByKey(id);
 
@@ -37,31 +36,27 @@ namespace Employee_Monitoring_System_API.Controllers
             {
                 return NotFound();
             }
-            var appSettingsDTO = _mapper.Map<AppSettingDTO>(appSettings);
-            return Ok(appSettingsDTO);
+            return Ok(appSettings);
         }
 
         // PUT: api/AppSettings/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public IActionResult PutAppSettings(string id, AppSettingDTO appSettingDTO)
+        public IActionResult PutAppSettings(string id, AppSettings appSetting)
         {
-            if (id != appSettingDTO.SettingKey)
+            if (id != appSetting.SettingKey)
             {
                 return BadRequest();
             }
-
-            var appSettings = _mapper.Map<AppSettings>(appSettingDTO);
-            _asr.Update(appSettings);
+            _asr.Update(appSetting);
             return Ok();
         }
 
         // POST: api/AppSettings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult PostAppSettings(AppSettingDTO appSettingsDTO)
+        public ActionResult PostAppSettings(AppSettings appSettings)
         {
-            var appSettings = _mapper.Map<AppSettings>(appSettingsDTO);
             _asr.Add(appSettings);
             return Ok();
         }

@@ -55,7 +55,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
             var project = _mapper.Map<Project>(projectDTO);
             var updatedProject = _pr.Update(project);
-            if (updatedProject != null)
+            if (updatedProject == null)
             {
                 return NotFound();
             }

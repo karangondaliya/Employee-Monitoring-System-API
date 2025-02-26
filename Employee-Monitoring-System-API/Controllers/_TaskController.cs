@@ -23,7 +23,7 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<TaskDTO>> GetTasks()
         {
             var task = _tr.GetTasks();
-            var taskDTO = _mapper.Map<TaskDTO>(task);
+            var taskDTO = _mapper.Map<IEnumerable<TaskDTO>>(task);
             return Ok(taskDTO);
         }
 
@@ -67,7 +67,7 @@ namespace Employee_Monitoring_System_API.Controllers
         {
             var task = _mapper.Map<_Task>(taskDTO);
             var addedTask = _tr.Add(task);
-            var CreatedTaskDTO = _mapper.Map<TaskDTO>(taskDTO);
+            var CreatedTaskDTO = _mapper.Map<TaskDTO>(addedTask);
             return CreatedAtAction(nameof(Get_Task), new { id = CreatedTaskDTO.TaskId }, CreatedTaskDTO);
         }
 
