@@ -17,6 +17,7 @@ namespace Employee_Monitoring_System_API
             CreateMap<Screenshot, ScreenshotDTO>();
             CreateMap<Notification, NotificationDTO>();
             CreateMap<LeaveRequest, LeaveRequestDTO>();
+            CreateMap<User, UserLoginDTO>();
         }
     }
 }

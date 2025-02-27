@@ -49,5 +49,10 @@ namespace Employee_Monitoring_System_API.Repository
             _context.SaveChanges();
             return userChanges;
         }
+
+        public User GetByEmail(string email)
+        {
+            return _context.Users.Find(email);
+        }
     }
 }
