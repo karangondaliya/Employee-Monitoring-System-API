@@ -9,20 +9,35 @@ namespace Employee_Monitoring_System_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly JwtService _jwtService;
 
-        public UsersController(IUserRepository userRepository, IMapper mapper)
+        public UsersController(IUserRepository userRepository, IMapper mapper, JwtService jwtService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _jwtService = jwtService;
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] UserLoginDTO loginDto)
+        {
+            var user = _userRepository.ValidateUser(loginDto.email, loginDto.password);
+
+            if (user == null)
+                return Unauthorized("Invalid credentials");
+
+            var token = _jwtService.GenerateToken(user.Email, user.Role);
+
+            return Ok(new { Token = token });
         }
 
         // GET: api/Users
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<UserDTO>> GetUsers()
         {
             var users = _userRepository.GetAllUsers();
@@ -32,6 +47,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "TeamLeadPolicy")]
         public ActionResult<UserDTO> GetUser(int id)
         {
             var user = _userRepository.GetUser(id);
@@ -48,6 +64,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/Users/5
         [HttpPatch("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult PatchUser(int id, User user)
         {
             if (id != user.Id)
@@ -67,6 +84,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // POST: api/Users
         [HttpPost]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult<UserDTO> PostUser(User user)
         {
             var addedUser = _userRepository.Add(user);
@@ -77,6 +95,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteUser(int id)
         {
             var user = _userRepository.Delete(id);

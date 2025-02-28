@@ -50,9 +50,9 @@ namespace Employee_Monitoring_System_API.Repository
             return userChanges;
         }
 
-        public User GetByEmail(string email)
+        public User ValidateUser(string email, string password)
         {
-            return _context.Users.Find(email);
+            return _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
         }
     }
 }
