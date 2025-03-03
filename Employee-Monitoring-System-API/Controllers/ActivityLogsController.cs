@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/ActivityLogs
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<ActivityLogDTO>> GetActivityLogs()
         {
             var activityLogs = _ar.GetAll();
@@ -29,6 +31,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/ActivityLogs/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<ActivityLogDTO> GetActivityLog(int id)
         {
             var activityLog = _ar.GetById(id);
@@ -44,6 +47,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/ActivityLogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult PutActivityLog(int id, ActivityLogDTO activityLogDTO)
         {
             if (id != activityLogDTO.LogId)
@@ -58,6 +62,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/ActivityLogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<ActivityLogDTO> PostActivityLog(ActivityLogDTO activityLogDTO)
         {
             var activityLog = _mapper.Map<ActivityLog>(activityLogDTO);
@@ -67,6 +72,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/ActivityLogs/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteActivityLog(int id)
         {
             _ar.Delete(id);

@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/AppSettings
         [HttpGet]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult<IEnumerable<AppSettings>> GetAppSettings()
         {
             var appSettings = _asr.GetAll();
@@ -28,6 +30,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/AppSettings/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult<AppSettings> GetAppSettings(string id)
         {
             var appSettings = _asr.GetByKey(id);
@@ -42,6 +45,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/AppSettings/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult PutAppSettings(string id, AppSettings appSetting)
         {
             if (id != appSetting.SettingKey)
@@ -55,6 +59,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/AppSettings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult PostAppSettings(AppSettings appSettings)
         {
             _asr.Add(appSettings);
@@ -63,6 +68,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/AppSettings/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteAppSettings(string id)
         {
             _asr.Delete(id);

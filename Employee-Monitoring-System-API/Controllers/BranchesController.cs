@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Branches
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<BranchDTO>> GetBranches()
         {
             var branches = _br.GetAll();
@@ -29,6 +31,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Branches/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<BranchDTO> GetBranch(int id)
         {
             var branch = _br.GetById(id);
@@ -44,6 +47,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/Branches/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult PutBranch(int id, BranchDTO branchDTO)
         {
             if (id != branchDTO.BranchId)
@@ -60,6 +64,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/Branches
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult<BranchDTO> PostBranch(BranchDTO branchDTO)
         {
             var branch = _mapper.Map<Branch>(branchDTO);
@@ -70,6 +75,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/Branches/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteBranch(int id)
         {
             _br.Delete(id);

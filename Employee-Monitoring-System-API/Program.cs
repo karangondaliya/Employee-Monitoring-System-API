@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +70,16 @@ builder.Services.AddSwaggerGen(c =>
             new string[] {}
         }
     });
+
+    var fileUploadSchema = new OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
+    };
+
+    c.MapType<IFormFile>(() => fileUploadSchema);
+
+    c.OperationFilter<SwaggerFileOperationFilter>();
 });
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -80,8 +92,13 @@ builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<IAppsettingRepository, AppsettingRepository>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.Configure<FormOptions>(options => {
+    options.MultipartBodyLengthLimit = 104857600; // 100 MB limit
+});
+builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
 
 var app = builder.Build();
+app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -94,6 +111,5 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.Run();

@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/_Task
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<TaskDTO>> GetTasks()
         {
             var task = _tr.GetTasks();
@@ -29,6 +31,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/_Task/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<TaskDTO> Get_Task(int id)
         {
             var _task = _tr.GetTask(id);
@@ -44,6 +47,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/_Task/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "TeamLeadPolicy")]
         public IActionResult Put_Task(int id, TaskDTO taskDTO)
         {
             if (id != taskDTO.TaskId)
@@ -63,6 +67,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/_Task
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "TeamLeadPolicy")]
         public ActionResult<TaskDTO> Post_Task(TaskDTO taskDTO)
         {
             var task = _mapper.Map<_Task>(taskDTO);
@@ -73,6 +78,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/_Task/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "TeamLeadPolicy")]
         public IActionResult Delete_Task(int id)
         {
             var _Task = _tr.Delete(id);

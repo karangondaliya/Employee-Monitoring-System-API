@@ -6,5 +6,6 @@
         public int UserId { get; set; }
         public string Description { get; set; }
         public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
+        public string ImagePath { get; set; }
     }
 }

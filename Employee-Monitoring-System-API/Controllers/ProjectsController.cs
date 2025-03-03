@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -21,6 +22,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Projects
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<ProjectDTO>> GetProjects()
         {
             var projects = _pr.GetAllProjects();
@@ -30,6 +32,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Projects/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<ProjectDTO> GetProject(int id)
         {
             var project = _pr.GetProject(id);
@@ -46,6 +49,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/Projects/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult PutProject(int id, ProjectDTO projectDTO)
         {
             if (id != projectDTO.ProjectId)
@@ -65,6 +69,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/Projects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult<Project> PostProject(Project project)
         {
             var addedProject = _pr.Add(project);
@@ -75,6 +80,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/Projects/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteProject(int id)
         {
             var project = _pr.Delete(id);

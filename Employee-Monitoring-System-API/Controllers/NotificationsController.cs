@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Notifications
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<NotificationDTO>> GetNotifications()
         {
             var notifications = _nr.GetAllNotifications();
@@ -29,6 +31,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Notifications/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<NotificationDTO> GetNotification(int id)
         {
             var notification = _nr.GetNotification(id);
@@ -45,6 +48,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/Notifications/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult PutNotification(int id, NotificationDTO notificationDTO)
         {
             if (id != notificationDTO.NotificationId)
@@ -66,6 +70,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/Notifications
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "AdminPolicy")]
         public ActionResult<Notification> PostNotification(NotificationDTO notificationDTO)
         {
             var notification = _mapper.Map<Notification>(notificationDTO);
@@ -75,6 +80,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/Notifications/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteNotification(int id)
         {
             var notification = _nr.Delete(id);

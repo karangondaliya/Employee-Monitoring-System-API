@@ -12,5 +12,6 @@ namespace Employee_Monitoring_System_API.Repository.IRepository
         User Update(User userChanges);
         User Delete(int id);
         User ValidateUser(string email, string password);
+        User FindByEmail(string email);
     }
 }

@@ -3,6 +3,7 @@ using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/LeaveRequests
         [HttpGet]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<IEnumerable<LeaveRequestDTO>> GetLeaveRequests()
         {
             var LeaveRequests = _lr.GetAllLeaveRequests();
@@ -29,6 +31,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/LeaveRequests/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<LeaveRequestDTO> GetLeaveRequest(int id)
         {
             var leaveRequest = _lr.GetLeaveRequest(id);
@@ -44,6 +47,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/LeaveRequests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public IActionResult PutLeaveRequest(int id, LeaveRequestDTO leaveRequestDTO)
         {
             if (id != leaveRequestDTO.LeaveRequestId)
@@ -63,6 +67,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // POST: api/LeaveRequests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<LeaveRequestDTO> PostLeaveRequest(LeaveRequestDTO leaveRequestDTO)
         {
             var leaveRequest = _mapper.Map<LeaveRequest>(leaveRequestDTO);
@@ -74,6 +79,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // DELETE: api/LeaveRequests/5
         [HttpDelete("{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
         public IActionResult DeleteLeaveRequest(int id)
         {
             var leaveRequest = _lr.Delete(id);

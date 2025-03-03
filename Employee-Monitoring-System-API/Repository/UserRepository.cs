@@ -54,5 +54,9 @@ namespace Employee_Monitoring_System_API.Repository
         {
             return _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
         }
+        public User FindByEmail(string email)
+        {
+            return _context.Users.FirstOrDefault(u => u.Email == email);
+        }
     }
 }
