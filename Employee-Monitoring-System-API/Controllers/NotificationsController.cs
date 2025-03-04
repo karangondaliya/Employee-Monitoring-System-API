@@ -100,7 +100,7 @@ namespace Employee_Monitoring_System_API.Controllers
             var notification = _nr.GetNotification(id);
             if (notification == null)
             {
-                return NotFound();
+                return NotFound("Notification Not Found.");
             }
             _nr.Delete(id);
             return Ok("Notification Deleted " + id);

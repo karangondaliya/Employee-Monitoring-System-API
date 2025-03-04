@@ -120,10 +120,36 @@ namespace Employee_Monitoring_System_API.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User Not Found.");
             }
             _userRepository.Delete(id);
             return Ok("User Deleted " + id);
         }
+
+        [HttpPost("update-password")]
+        [AllowAnonymous]
+        public IActionResult UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDto)
+        {
+            var user = _userRepository.FindByEmail(updatePasswordDto.Email);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Verify the old password
+            if (!BCrypt.Net.BCrypt.Verify(updatePasswordDto.OldPassword, user.Password))
+            {
+                return Unauthorized(new { message = "Old password is incorrect" });
+            }
+
+            // Hash the new password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(updatePasswordDto.NewPassword);
+
+            _userRepository.Update(user);
+
+            return Ok(new { message = "Password updated successfully" });
+        }
+
+
     }
 }

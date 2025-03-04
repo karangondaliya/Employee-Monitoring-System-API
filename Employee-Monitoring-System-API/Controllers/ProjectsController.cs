@@ -107,7 +107,7 @@ namespace Employee_Monitoring_System_API.Controllers
             }
 
             _pr.Delete(id);
-            return NoContent();
+            return Ok("Project Deleted " + id);
         }
 
         //private bool ProjectExists(Guid id)

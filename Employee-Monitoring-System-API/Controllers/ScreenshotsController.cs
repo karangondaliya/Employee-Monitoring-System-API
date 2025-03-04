@@ -187,7 +187,7 @@ namespace Employee_Monitoring_System_API.Controllers
             }
 
             _screenshotRepository.Delete(id);
-            return NoContent();
+            return Ok("Screenshot Deleted " + id);
         }
 
         //private bool ScreenshotExists(Guid id)
