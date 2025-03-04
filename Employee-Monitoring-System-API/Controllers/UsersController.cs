@@ -4,7 +4,7 @@ using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using BCrypt.Net;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -42,6 +42,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<UserDTO>> GetUsers()
         {
             var users = _userRepository.GetAllUsers();
+            if(users == null || !users.Any())
+            {
+                return NotFound("Users Not Found.");
+            }
             var UserDTOs = _mapper.Map<IEnumerable<UserDTO>>(users);
             return Ok(UserDTOs);
         }
@@ -52,33 +56,45 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<UserDTO> GetUser(int id)
         {
             var user = _userRepository.GetUser(id);
-
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User Not Found");
             }
-
             var userDTO = _mapper.Map<UserDTO>(user);
-
             return Ok(userDTO);
         }
 
         // PUT: api/Users/5
         [HttpPatch("{id}")]
         [Authorize(Policy = "AdminPolicy")]
-        public IActionResult PatchUser(int id, User user)
+        public IActionResult PatchUser(int id, [FromBody] JsonPatchDocument<User> patchDoc)
         {
-            if (id != user.Id)
+            if (patchDoc == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid patch document.");
+            }
+
+            var user = _userRepository.GetUser(id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Apply patch to the user entity
+            patchDoc.ApplyTo(user, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             var updatedUser = _userRepository.Update(user);
 
             if (updatedUser == null)
             {
-                return NotFound();
+                return StatusCode(500, "Error updating user.");
             }
+
             var updatedUserDTO = _mapper.Map<UserDTO>(updatedUser);
             return Ok(updatedUserDTO);
         }
@@ -100,14 +116,14 @@ namespace Employee_Monitoring_System_API.Controllers
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteUser(int id)
         {
-            var user = _userRepository.Delete(id);
+            var user = _userRepository.GetUser(id);
 
             if (user == null)
             {
                 return NotFound();
             }
-
-            return NoContent();
+            _userRepository.Delete(id);
+            return Ok("User Deleted " + id);
         }
     }
 }

@@ -4,6 +4,7 @@ using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -25,6 +26,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<TaskDTO>> GetTasks()
         {
             var task = _tr.GetTasks();
+            if (task == null || !task.Any())
+            {
+                return NotFound("Tasks Not Found.");
+            }
             var taskDTO = _mapper.Map<IEnumerable<TaskDTO>>(task);
             return Ok(taskDTO);
         }
@@ -35,10 +40,9 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<TaskDTO> Get_Task(int id)
         {
             var _task = _tr.GetTask(id);
-
             if (_task == null)
             {
-                return NotFound();
+                return NotFound("Task Not Found.");
             }
             var taskDTO = _mapper.Map<TaskDTO>(_task);
             return Ok(taskDTO);
@@ -46,22 +50,27 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/_Task/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         [Authorize(Policy = "TeamLeadPolicy")]
-        public IActionResult Put_Task(int id, TaskDTO taskDTO)
+        public IActionResult Patch_Task(int id, [FromBody] JsonPatchDocument<TaskDTO> patchDoc)
         {
-            if (id != taskDTO.TaskId)
-            {
-                return BadRequest();
-            }
-            var task = _mapper.Map<_Task>(taskDTO);
-            var updatedTask = _tr.Update(task);
-            if (updatedTask == null)
-            {
-                return NotFound();
-            }
-            var updatedTaskDTO = _mapper.Map<TaskDTO>(updatedTask);
-            return Ok(updatedTaskDTO);
+            if (patchDoc == null)
+                return BadRequest("Invalid patch document.");
+
+            var existingTask = _tr.GetTask(id);
+            if (existingTask == null)
+                return NotFound($"Task with ID {id} not found.");
+
+            var taskDTO = _mapper.Map<TaskDTO>(existingTask);
+            patchDoc.ApplyTo(taskDTO, ModelState);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updatedTask = _mapper.Map<_Task>(taskDTO);
+            _tr.Update(updatedTask);
+
+            return Ok("Task Updated."); // Success - No content returned
         }
 
         // POST: api/_Task
@@ -81,12 +90,13 @@ namespace Employee_Monitoring_System_API.Controllers
         [Authorize(Policy = "TeamLeadPolicy")]
         public IActionResult Delete_Task(int id)
         {
-            var _Task = _tr.Delete(id);
+            var _Task = _tr.GetTask(id);
             if (_Task == null)
             {
-                return NotFound();
+                return NotFound("Task Not Found.");
             }
-            return NoContent();
+            _tr.Delete(id);
+            return Ok("Task Deleted " + id);
         }
 
         //private bool _TaskExists(int id)

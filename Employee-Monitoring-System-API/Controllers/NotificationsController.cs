@@ -4,6 +4,7 @@ using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -25,6 +26,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<NotificationDTO>> GetNotifications()
         {
             var notifications = _nr.GetAllNotifications();
+            if(notifications == null || !notifications.Any())
+            {
+                return NotFound("No notifications found.");
+            }
             var notificationDTOs = _mapper.Map<IEnumerable<NotificationDTO>>(notifications);
             return Ok(notificationDTOs);
         }
@@ -38,7 +43,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
             if (notification == null)
             {
-                return NotFound();
+                return NotFound("Notification Not Found.");
             }
 
             var notificationDTO = _mapper.Map<NotificationDTO>(notification);
@@ -47,24 +52,33 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/Notifications/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         [Authorize(Policy = "AdminPolicy")]
-        public IActionResult PutNotification(int id, NotificationDTO notificationDTO)
+        public IActionResult PatchNotification(int id, [FromBody] JsonPatchDocument<NotificationDTO> patchDoc)
         {
-            if (id != notificationDTO.NotificationId)
+            if (patchDoc == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid patch document.");
             }
 
-            var notification = _mapper.Map<Notification>(notificationDTO);
-            var updatedNotification = _nr.Update(notification);
-
-            if(updatedNotification == null)
+            var notification = _nr.GetNotification(id);
+            if (notification == null)
             {
-                return NotFound();
+                return NotFound("Notification not found.");
             }
 
-            return NoContent();
+            var notificationDTO = _mapper.Map<NotificationDTO>(notification);
+            patchDoc.ApplyTo(notificationDTO, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updatedNotification = _mapper.Map<Notification>(notificationDTO);
+            _nr.Update(updatedNotification);
+
+            return Ok(_mapper.Map<NotificationDTO>(updatedNotification));
         }
 
         // POST: api/Notifications
@@ -75,7 +89,7 @@ namespace Employee_Monitoring_System_API.Controllers
         {
             var notification = _mapper.Map<Notification>(notificationDTO);
             _nr.Add(notification);
-            return NoContent();
+            return Ok("Notification Added");
         }
 
         // DELETE: api/Notifications/5
@@ -83,13 +97,13 @@ namespace Employee_Monitoring_System_API.Controllers
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteNotification(int id)
         {
-            var notification = _nr.Delete(id);
+            var notification = _nr.GetNotification(id);
             if (notification == null)
             {
                 return NotFound();
             }
-
-            return NoContent();
+            _nr.Delete(id);
+            return Ok("Notification Deleted " + id);
         }
 
         //private bool NotificationExists(int id)

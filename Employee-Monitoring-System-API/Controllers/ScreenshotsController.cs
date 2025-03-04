@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -34,6 +35,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<ScreenshotDTO>> GetScreenshots()
         {
             var screenshots = _screenshotRepository.GetAllScreenshots();
+            if(screenshots == null || !screenshots.Any())
+            {
+                return NotFound("Screenshot Not Found.");
+            }
             var screenshotDTOs = screenshots.Select(ss => new ScreenshotDTO
             {
                 ScreenshotId = ss.ScreenshotId,
@@ -50,13 +55,11 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<ScreenshotDTO> GetScreenshot(int id)
         {
             var screenshot = _screenshotRepository.GetScreenshot(id);
-
             if (screenshot == null)
             {
-                return NotFound();
+                return NotFound("Screenshot Not Found.");
             }
             var screenshotDTO = _mapper.Map<ScreenshotDTO>(screenshot);
-
             return Ok(screenshotDTO);
         }
 
@@ -64,20 +67,39 @@ namespace Employee_Monitoring_System_API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("{id}")]
         [Authorize(Policy = "EmployeePolicy")]
-        public IActionResult PutScreenshot(int id, Screenshot screenshot)
+        public IActionResult PatchScreenshot(int id, [FromBody] JsonPatchDocument<Screenshot> patchDoc)
         {
-            if (id != screenshot.ScreenshotId)
+            if (patchDoc == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid patch request.");
             }
 
-            var updatedSs = _screenshotRepository.Update(screenshot);
-            if(updatedSs == null)
+            // Fetch the existing Screenshot from the repository
+            var screenshot = _screenshotRepository.GetScreenshot(id);
+            if (screenshot == null)
             {
-                return NotFound();
+                return NotFound("Screenshot not found.");
             }
-            var updatedSsDTO = _mapper.Map<ScreenshotDTO>(updatedSs);
-            return Ok(updatedSsDTO);
+
+            // Apply the patch
+            patchDoc.ApplyTo(screenshot, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Save changes
+            var updatedScreenshot = _screenshotRepository.Update(screenshot);
+
+            if (updatedScreenshot == null)
+            {
+                return StatusCode(500, "Error updating the screenshot.");
+            }
+
+            // Convert to DTO and return response
+            var updatedScreenshotDTO = _mapper.Map<ScreenshotDTO>(updatedScreenshot);
+            return Ok(updatedScreenshotDTO);
         }
 
         // POST: api/Screenshots

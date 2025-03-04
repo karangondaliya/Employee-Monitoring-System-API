@@ -4,6 +4,7 @@ using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -26,6 +27,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<ProjectDTO>> GetProjects()
         {
             var projects = _pr.GetAllProjects();
+            if (projects == null || !projects.Any())
+            {
+                return NotFound("No projects found.");
+            }
             var projectDTO = _mapper.Map<IEnumerable<ProjectDTO>>(projects);
             return Ok(projectDTO);
         }
@@ -39,7 +44,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
             if (project == null)
             {
-                return NotFound();
+                return NotFound($"Project with ID {id} not found.");
             }
 
             var projectDTO = _mapper.Map<ProjectDTO>(project);
@@ -48,34 +53,46 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/Projects/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         [Authorize(Policy = "AdminPolicy")]
-        public IActionResult PutProject(int id, ProjectDTO projectDTO)
+        public IActionResult PatchProject(int id, [FromBody] JsonPatchDocument<ProjectDTO> patchDoc)
         {
-            if (id != projectDTO.ProjectId)
+            if (patchDoc == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid patch document.");
             }
 
-            var project = _mapper.Map<Project>(projectDTO);
-            var updatedProject = _pr.Update(project);
-            if (updatedProject == null)
+            var project = _pr.GetProject(id);
+            if (project == null)
             {
-                return NotFound();
+                return NotFound("Project not found.");
             }
-            return NoContent();
+
+            var projectDTO = _mapper.Map<ProjectDTO>(project);
+            patchDoc.ApplyTo(projectDTO, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updatedProject = _mapper.Map<Project>(projectDTO);
+            _pr.Update(updatedProject);
+
+            return Ok(_mapper.Map<ProjectDTO>(updatedProject));
         }
 
         // POST: api/Projects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Policy = "AdminPolicy")]
-        public ActionResult<Project> PostProject(Project project)
+        public ActionResult<ProjectDTO> PostProject(ProjectDTO projectDTO)
         {
+            var project = _mapper.Map<Project>(projectDTO);
             var addedProject = _pr.Add(project);
-
             var createdProjectDTO = _mapper.Map<ProjectDTO>(addedProject);
-            return CreatedAtAction("GetProject", new { id = addedProject.ProjectId }, addedProject);
+
+            return CreatedAtAction(nameof(GetProject), new { id = createdProjectDTO.ProjectId }, createdProjectDTO);
         }
 
         // DELETE: api/Projects/5
@@ -83,12 +100,13 @@ namespace Employee_Monitoring_System_API.Controllers
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult DeleteProject(int id)
         {
-            var project = _pr.Delete(id);
+            var project = _pr.GetProject(id);
             if (project == null)
             {
-                return NotFound();
+                return NotFound("Project not found.");
             }
 
+            _pr.Delete(id);
             return NoContent();
         }
 

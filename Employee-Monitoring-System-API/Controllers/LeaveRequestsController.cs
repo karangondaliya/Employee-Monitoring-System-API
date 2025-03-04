@@ -4,6 +4,7 @@ using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -25,6 +26,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<IEnumerable<LeaveRequestDTO>> GetLeaveRequests()
         {
             var LeaveRequests = _lr.GetAllLeaveRequests();
+            if(LeaveRequests == null || !LeaveRequests.Any())
+            {
+                return NotFound("No leave requests found.");
+            }
             var LeaveRequestsDTO = _mapper.Map<IEnumerable<LeaveRequestDTO>>(LeaveRequests);
             return Ok(LeaveRequestsDTO);
         }
@@ -38,7 +43,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
             if (leaveRequest == null)
             {
-                return NotFound();
+                return NotFound("LeaveRequest Not Found.");
             }
             var leaveRequestDTO = _mapper.Map<LeaveRequestDTO>(leaveRequest);
             return Ok(leaveRequest);
@@ -46,22 +51,33 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/LeaveRequests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         [Authorize(Policy = "EmployeePolicy")]
-        public IActionResult PutLeaveRequest(int id, LeaveRequestDTO leaveRequestDTO)
+        public IActionResult PatchLeaveRequest(int id, [FromBody] JsonPatchDocument<LeaveRequestDTO> patchDoc)
         {
-            if (id != leaveRequestDTO.LeaveRequestId)
+            if (patchDoc == null)
             {
-                return BadRequest();
+                return BadRequest("Invalid patch document.");
             }
 
-            var leaveRequest = _mapper.Map<LeaveRequest>(leaveRequestDTO);
-            var updatedLeave = _lr.Update(leaveRequest);
-            if(updatedLeave == null)
+            var leaveRequest = _lr.GetLeaveRequest(id);
+            if (leaveRequest == null)
             {
-                return NotFound();
+                return NotFound("Leave request not found.");
             }
-            return Ok(updatedLeave);
+
+            var leaveRequestDTO = _mapper.Map<LeaveRequestDTO>(leaveRequest);
+            patchDoc.ApplyTo(leaveRequestDTO, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var updatedLeaveRequest = _mapper.Map<LeaveRequest>(leaveRequestDTO);
+            _lr.Update(updatedLeaveRequest);
+
+            return Ok(_mapper.Map<LeaveRequestDTO>(updatedLeaveRequest));
         }
 
         // POST: api/LeaveRequests
@@ -82,13 +98,13 @@ namespace Employee_Monitoring_System_API.Controllers
         [Authorize(Policy = "EmployeePolicy")]
         public IActionResult DeleteLeaveRequest(int id)
         {
-            var leaveRequest = _lr.Delete(id);
+            var leaveRequest = _lr.GetLeaveRequest(id);
             if (leaveRequest == null)
             {
-                return NotFound();
+                return NotFound("Leave Request Not Found.");
             }
-
-            return NoContent();
+            _lr.Delete(id);
+            return Ok("Leave Request Deleted " + id);
         }
 
         //private bool LeaveRequestExists(int id)

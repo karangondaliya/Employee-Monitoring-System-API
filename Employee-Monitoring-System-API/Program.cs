@@ -2,14 +2,12 @@
 using Employee_Monitoring_System_API.Repository.IRepository;
 using Employee_Monitoring_System_API.Repository;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using Employee_Monitoring_System_API;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,6 +94,7 @@ builder.Services.Configure<FormOptions>(options => {
     options.MultipartBodyLengthLimit = 104857600; // 100 MB limit
 });
 builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 var app = builder.Build();
 app.UseStaticFiles();
