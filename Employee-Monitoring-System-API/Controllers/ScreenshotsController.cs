@@ -37,6 +37,7 @@ namespace Employee_Monitoring_System_API.Controllers
             var screenshotDTOs = screenshots.Select(ss => new ScreenshotDTO
             {
                 ScreenshotId = ss.ScreenshotId,
+                UserId = ss.UserId,
                 ImagePath = $"{Request.Scheme}://{Request.Host}{(ss.ImagePath.StartsWith("/") ? ss.ImagePath : "/" + ss.ImagePath)}"
             });
 

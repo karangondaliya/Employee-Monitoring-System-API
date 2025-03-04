@@ -4,6 +4,7 @@ using Employee_Monitoring_System_API.Repository.IRepository;
 using AutoMapper;
 using Employee_Monitoring_System_API.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using BCrypt.Net;
 
 namespace Employee_Monitoring_System_API.Controllers
 {
@@ -25,9 +26,9 @@ namespace Employee_Monitoring_System_API.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLoginDTO loginDto)
         {
-            var user = _userRepository.ValidateUser(loginDto.email, loginDto.password);
+            var user = _userRepository.FindByEmail(loginDto.email);
 
-            if (user == null)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.password, user.Password))
                 return Unauthorized("Invalid credentials");
 
             var token = _jwtService.GenerateToken(user.Email, user.Role);
@@ -87,6 +88,7 @@ namespace Employee_Monitoring_System_API.Controllers
         [Authorize(Policy = "AdminPolicy")]
         public ActionResult<UserDTO> PostUser(User user)
         {
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             var addedUser = _userRepository.Add(user);
 
             var createdUserDTO = _mapper.Map<UserDTO>(addedUser);
