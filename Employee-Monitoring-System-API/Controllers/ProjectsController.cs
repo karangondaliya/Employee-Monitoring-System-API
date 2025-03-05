@@ -110,6 +110,20 @@ namespace Employee_Monitoring_System_API.Controllers
             return Ok("Project Deleted " + id);
         }
 
+        [HttpGet("test-mapping")]
+        public IActionResult TestAutoMapper()
+        {
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>(); // Ensure this matches your actual profile class name
+            });
+
+            configuration.AssertConfigurationIsValid(); // This will throw an error if the mapping is invalid
+
+            return Ok("AutoMapper configuration is valid!");
+        }
+
+
         //private bool ProjectExists(Guid id)
         //{
         //    return _context.Projects.Any(e => e.ProjectId == id);

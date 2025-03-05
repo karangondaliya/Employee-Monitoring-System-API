@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.CodeAnalysis;
 
 namespace Employee_Monitoring_System_API.Repository
 {
@@ -42,10 +43,14 @@ namespace Employee_Monitoring_System_API.Repository
 
         public Notification Update(Notification notificationChanges)
         {
-            var n = _context.Notifications.Attach(notificationChanges);
-            n.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
-            return notificationChanges;
+            var n = _context.Notifications.Find(notificationChanges.NotificationId);
+            if (n != null)
+            {
+                _context.Entry(n).CurrentValues.SetValues(notificationChanges);
+                _context.SaveChanges();
+                return n;
+            }
+            return null;
         }
     }
 }

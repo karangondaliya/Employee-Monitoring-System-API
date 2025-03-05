@@ -45,10 +45,14 @@ namespace Employee_Monitoring_System_API.Repository
 
         public Project Update(Project projectChanges)
         {
-            var pr = _context.Projects.Attach(projectChanges);
-            pr.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
-            return projectChanges;
+            var pr = _context.Projects.Find(projectChanges.ProjectId);
+            if (pr != null)
+            {
+                _context.Entry(pr).CurrentValues.SetValues(projectChanges);
+                _context.SaveChanges();
+                return pr;
+            }
+            return null; // Or handle the case where the project doesn't exist
         }
     }
 }

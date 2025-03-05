@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace Employee_Monitoring_System_API.Repository
@@ -47,10 +48,14 @@ namespace Employee_Monitoring_System_API.Repository
 
         public _Task Update(_Task taskChanges)
         {
-            var task = _context.Tasks.Attach(taskChanges);
-            task.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
-            return taskChanges;
+            var task = _context.Tasks.Find(taskChanges.TaskId);
+            if (task != null)
+            {
+                _context.Entry(task).CurrentValues.SetValues(taskChanges);
+                _context.SaveChanges();
+                return task;
+            }
+            return null;
         }
     }
 }

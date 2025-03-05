@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.CodeAnalysis;
 
 namespace Employee_Monitoring_System_API.Repository
 {
@@ -41,9 +42,12 @@ namespace Employee_Monitoring_System_API.Repository
 
         public void Update(AppSettings appSettingsChanges)
         {
-            var appset = _context.AppSettings.Attach(appSettingsChanges);
-            appset.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
+            var appset = _context.AppSettings.Find(appSettingsChanges.SettingKey);
+            if (appset != null)
+            {
+                _context.Entry(appset).CurrentValues.SetValues(appSettingsChanges);
+                _context.SaveChanges();
+            }
         }
     }
 }

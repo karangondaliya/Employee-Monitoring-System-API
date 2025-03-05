@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.CodeAnalysis;
 
 namespace Employee_Monitoring_System_API.Repository
 {
@@ -42,9 +43,12 @@ namespace Employee_Monitoring_System_API.Repository
 
         public void Update(ActivityLog activityChanges)
         {
-            var al = _context.ActivityLogs.Attach(activityChanges);
-            al.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
+            var al = _context.ActivityLogs.Find(activityChanges.LogId);
+            if (al != null)
+            {
+                _context.Entry(al).CurrentValues.SetValues(activityChanges);
+                _context.SaveChanges();
+            }
         }
     }
 }

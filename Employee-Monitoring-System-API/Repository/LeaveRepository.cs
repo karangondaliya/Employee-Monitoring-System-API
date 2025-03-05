@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.CodeAnalysis;
 
 namespace Employee_Monitoring_System_API.Repository
 {
@@ -45,10 +46,14 @@ namespace Employee_Monitoring_System_API.Repository
 
         public LeaveRequest Update(LeaveRequest leaveRequestChanges)
         {
-            var lr = _context.LeaveRequests.Attach(leaveRequestChanges);
-            lr.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
-            return leaveRequestChanges;
+            var lr = _context.LeaveRequests.Find(leaveRequestChanges.LeaveRequestId);
+            if (lr != null)
+            {
+                _context.Entry(lr).CurrentValues.SetValues(leaveRequestChanges);
+                _context.SaveChanges();
+                return lr;
+            }
+            return null;
         }
     }
 }

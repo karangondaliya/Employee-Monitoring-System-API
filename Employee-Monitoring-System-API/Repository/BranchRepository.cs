@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.CodeAnalysis;
 
 namespace Employee_Monitoring_System_API.Repository
 {
@@ -41,9 +42,12 @@ namespace Employee_Monitoring_System_API.Repository
 
         public void Update(Branch branchChanges)
         {
-            var br = _context.Branches.Attach(branchChanges);
-            br.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
+            var br = _context.Branches.Find(branchChanges.BranchId);
+            if (br != null)
+            {
+                _context.Entry(br).CurrentValues.SetValues(branchChanges);
+                _context.SaveChanges();
+            }
         }
     }
 }
