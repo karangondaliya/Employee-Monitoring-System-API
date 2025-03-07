@@ -31,6 +31,10 @@ namespace Employee_Monitoring_System_API.Controllers
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.password, user.Password))
                 return Unauthorized("Invalid credentials");
 
+            // Update LastLogin field
+            user.LastLogin = DateTime.UtcNow;
+            _userRepository.Update(user); // Save changes to DB
+
             var token = _jwtService.GenerateToken(user.Email, user.Role);
 
             return Ok(new { Token = token, Role = user.Role, Id = user.Id });
@@ -149,7 +153,5 @@ namespace Employee_Monitoring_System_API.Controllers
 
             return Ok(new { message = "Password updated successfully" });
         }
-
-
     }
 }

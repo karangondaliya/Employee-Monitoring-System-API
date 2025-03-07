@@ -34,6 +34,18 @@ namespace Employee_Monitoring_System_API.Controllers
             return Ok(notificationDTOs);
         }
 
+        [HttpGet("GetUserNotifications/{userId}")]
+        [Authorize(Policy = "EmployeePolicy")]
+        public ActionResult<IEnumerable<NotificationDTO>> GetUserNotifications(int userId)
+        {
+            var notifications = _nr.GetUserNotifications(userId); // Implement this in the repository
+            if (notifications == null || !notifications.Any())
+            {
+                return NotFound("No notifications found.");
+            }
+            return Ok(_mapper.Map<IEnumerable<NotificationDTO>>(notifications));
+        }
+
         // GET: api/Notifications/5
         [HttpGet("{id}")]
         [Authorize(Policy = "EmployeePolicy")]

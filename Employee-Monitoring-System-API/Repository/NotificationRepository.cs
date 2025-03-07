@@ -52,5 +52,10 @@ namespace Employee_Monitoring_System_API.Repository
             }
             return null;
         }
+
+        public IEnumerable<Notification> GetUserNotifications(int userId)
+        {
+            return _context.Notifications.Where(n => n.UserId == userId).ToList();
+        }
     }
 }
