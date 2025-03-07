@@ -33,7 +33,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
             var token = _jwtService.GenerateToken(user.Email, user.Role);
 
-            return Ok(new { Token = token });
+            return Ok(new { Token = token, Role = user.Role, Id = user.Id });
         }
 
         // GET: api/Users
