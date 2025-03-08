@@ -36,7 +36,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/AppSettings/5
         [HttpGet("{id}")]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<AppSettings> GetAppSettings(string id)
         {
             var appSettings = _asr.GetByKey(id);

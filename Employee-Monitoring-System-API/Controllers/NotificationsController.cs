@@ -65,7 +65,7 @@ namespace Employee_Monitoring_System_API.Controllers
         // PUT: api/Notifications/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("{id}")]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "EmployeePolicy")]
         public IActionResult PatchNotification(int id, [FromBody] JsonPatchDocument<NotificationDTO> patchDoc)
         {
             if (patchDoc == null)
