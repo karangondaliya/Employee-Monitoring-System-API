@@ -107,6 +107,20 @@ namespace Employee_Monitoring_System_API.Controllers
             return Ok("Leave Request Deleted " + id);
         }
 
+        // GET: api/LeaveRequests/GetByUserId/5
+        [HttpGet("GetByUserId/{id}")]
+        [Authorize(Policy = "EmployeePolicy")]
+        public ActionResult<IEnumerable<LeaveRequestDTO>> GetByUserId(int id)
+        {
+            var LeaveRequests = _lr.GetByUserId(id);
+            if (LeaveRequests == null || !LeaveRequests.Any())
+            {
+                return NotFound("No leave requests found.");
+            }
+            var LeaveRequestsDTO = _mapper.Map<IEnumerable<LeaveRequestDTO>>(LeaveRequests);
+            return Ok(LeaveRequestsDTO);
+        }
+
         //private bool LeaveRequestExists(int id)
         //{
         //    return _context.LeaveRequests.Any(e => e.LeaveRequestId == id);

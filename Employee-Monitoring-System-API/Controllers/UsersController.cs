@@ -56,7 +56,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        [Authorize(Policy = "TeamLeadPolicy")]
+        [Authorize(Policy = "EmployeePolicy")]
         public ActionResult<UserDTO> GetUser(int id)
         {
             var user = _userRepository.GetUser(id);
@@ -70,7 +70,7 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/Users/5
         [HttpPatch("{id}")]
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "EmployeePolicy")]
         public IActionResult PatchUser(int id, [FromBody] JsonPatchDocument<User> patchDoc)
         {
             if (patchDoc == null)

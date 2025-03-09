@@ -39,6 +39,11 @@ namespace Employee_Monitoring_System_API.Repository
             return _context.LeaveRequests.ToList();
         }
 
+        public IEnumerable<LeaveRequest> GetByUserId(int id)
+        {
+            return _context.LeaveRequests.Where(l => l.UserId == id).ToList();
+        }
+
         public LeaveRequest GetLeaveRequest(int id)
         {
             return _context.LeaveRequests.Find(id);

@@ -9,5 +9,6 @@ namespace Employee_Monitoring_System_API.Repository.IRepository
         LeaveRequest Add(LeaveRequest leaveRequest);
         LeaveRequest Update(LeaveRequest leaveRequestChanges);
         LeaveRequest Delete(int id);
+        IEnumerable<LeaveRequest> GetByUserId(int id);
     }
 }
