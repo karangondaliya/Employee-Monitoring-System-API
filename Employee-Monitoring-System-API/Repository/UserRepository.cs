@@ -31,15 +31,20 @@ namespace Employee_Monitoring_System_API.Repository
             }
             return user;
         }
-
-        public IEnumerable<User> GetAllUsers()
+        public List<User> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return _context.Users
+                .Include(u => u.UserTasks).ThenInclude(ut => ut.Task)
+                .Include(u => u.ProjectMemberships).ThenInclude(pm => pm.Project)
+                .ToList();
         }
 
         public User GetUser(int id)
         {
-            return _context.Users.Find(id);
+            return _context.Users
+            .Include(u => u.UserTasks).ThenInclude(ut => ut.Task)
+            .Include(u => u.ProjectMemberships).ThenInclude(pm => pm.Project)
+            .FirstOrDefault(u => u.Id == id);
         }
 
         public User Update(User userChanges)

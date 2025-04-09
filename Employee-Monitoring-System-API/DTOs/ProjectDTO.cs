@@ -12,5 +12,7 @@
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int? CreatedBy { get; set; }
+        public List<UserMiniDTO>? TeamMembers { get; set; }
+
     }
 }

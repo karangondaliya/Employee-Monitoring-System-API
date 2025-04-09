@@ -35,7 +35,7 @@ namespace Employee_Monitoring_System_API.Models
 
         public DateTime RequestDate { get; set; } = DateTime.UtcNow; // New field for request date
 
-        public int? Duration { get; set; }
+        public string Duration { get; set; }
 
         public int? ApproverId { get; set; }
     }

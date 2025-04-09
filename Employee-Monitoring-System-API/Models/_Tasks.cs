@@ -35,5 +35,7 @@ namespace Employee_Monitoring_System_API.Models
         public string? Description { get; set; }
         public int TimeSpent { get; set; } = 0; // Time in minutes
         public DateTime? CompletionDate { get; set; }
+        // Many-to-Many Relationship
+        public List<UserTask> UserTasks { get; set; }
     }
 }

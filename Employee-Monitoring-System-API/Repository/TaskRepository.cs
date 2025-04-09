@@ -38,12 +38,18 @@ namespace Employee_Monitoring_System_API.Repository
 
         public _Task GetTask(int id)
         {
-            return _context.Tasks.Find(id);
+            return _context.Tasks
+            .Include(t => t.UserTasks).ThenInclude(ut => ut.User)
+            .Include(t => t.Project)
+            .FirstOrDefault(t => t.Id == id);
         }
 
         public IEnumerable<_Task> GetTasks()
         {
-            return _context.Tasks.ToList();
+            return _context.Tasks
+            .Include(t => t.UserTasks).ThenInclude(ut => ut.User)
+            .Include(t => t.Project)
+            .ToList();
         }
 
         public _Task Update(_Task taskChanges)

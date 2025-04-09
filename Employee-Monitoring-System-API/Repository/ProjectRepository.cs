@@ -1,6 +1,7 @@
 ﻿using Employee_Monitoring_System_API.Data;
 using Employee_Monitoring_System_API.Models;
 using Employee_Monitoring_System_API.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Employee_Monitoring_System_API.Repository
 {
@@ -35,12 +36,18 @@ namespace Employee_Monitoring_System_API.Repository
 
         public IEnumerable<Project> GetAllProjects()
         {
-            return _context.Projects.ToList();
+            return _context.Projects
+            .Include(p => p.ProjectMembers).ThenInclude(pm => pm.User)
+            .Include(p => p.Tasks)
+            .ToList();
         }
 
         public Project GetProject(int id)
         {
-            return _context.Projects.Find(id);
+            return _context.Projects
+           .Include(p => p.ProjectMembers).ThenInclude(pm => pm.User)
+           .Include(p => p.Tasks)
+           .FirstOrDefault(p => p.ProjectId == id);
         }
 
         public Project Update(Project projectChanges)

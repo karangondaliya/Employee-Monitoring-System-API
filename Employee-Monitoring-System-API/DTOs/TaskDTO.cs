@@ -6,8 +6,7 @@
         public string TaskName { get; set; }
         public int ProjectId { get; set; }
         public string? ProjectName { get; set; }
-        public int AssignedTo { get; set; }
-        public string? AssignedUserName { get; set; }
+        public List<UserMiniDTO>? AssignedUsers { get; set; }
         public string Priority { get; set; }
         public string Status { get; set; }
         public DateTime StartDate { get; set; }

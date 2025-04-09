@@ -11,5 +11,13 @@
         public bool IsActive { get; set; }
         public string? PhoneNumber { get; set; }
         public DateTime? LastLogin { get; set; } = DateTime.UtcNow;
+        public string? JobTitle { get; set; }
+        public string? Address { get; set; }
+        public Dictionary<string, string>? TechnicalSkills { get; set; }
+        public List<string>? Certifications { get; set; }
+        public string? ProfileImageBase64 { get; set; } // optional if you plan to show the image
+        public List<TaskMiniDTO>? Tasks { get; set; } // from UserTasks
+        public List<ProjectMiniDTO>? Projects { get; set; } // from ProjectMemberships
+
     }
 }

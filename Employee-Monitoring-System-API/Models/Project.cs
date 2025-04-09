@@ -25,5 +25,7 @@ namespace Employee_Monitoring_System_API.Models
         public ICollection<_Task>? Tasks { get; set; }
         public string? Description { get; set; }
         public int? CompletionPercentage { get; set; } = 0;
+        public double? Budget { get; set; } // New field for project budget
+        public List<ProjectMember> ProjectMembers { get; set; }
     }
 }

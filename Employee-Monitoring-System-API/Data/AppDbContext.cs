@@ -61,6 +61,19 @@ namespace Employee_Monitoring_System_API.Data
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired(false);
 
+            modelBuilder.Entity<UserTask>()
+            .HasKey(ut => new { ut.UserId, ut.TaskId }); // Composite primary key
+
+            modelBuilder.Entity<UserTask>()
+                .HasOne(ut => ut.User)
+                .WithMany(u => u.UserTasks)
+                .HasForeignKey(ut => ut.UserId);
+
+            modelBuilder.Entity<UserTask>()
+                .HasOne(ut => ut.Task)
+                .WithMany(t => t.UserTasks)
+                .HasForeignKey(ut => ut.TaskId);
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -73,5 +86,8 @@ namespace Employee_Monitoring_System_API.Data
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<AppSettings> AppSettings { get; set; }
+        public DbSet<ProjectMember> ProjectMembers { get; set; }
+        public DbSet<UserTask> UserTasks { get; set; } // Many-to-Many relationship between User and Task
+        public DbSet<Holiday> Holidays { get; set; } // New DbSet for holidays
     }
 }

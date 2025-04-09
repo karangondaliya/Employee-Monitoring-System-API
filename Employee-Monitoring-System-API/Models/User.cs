@@ -33,12 +33,28 @@ namespace Employee_Monitoring_System_API.Models
 
         public DateTime? LastLogin { get; set; }
 
+        public string JobTitle { get; set; }
+        public string Address { get; set; }
+
+        // Technical skills stored as JSON (Key: Skill Name, Value: Proficiency Level)
+        public Dictionary<string, string>? TechnicalSkills { get; set; } = new Dictionary<string, string>();
+
+        // List of certifications
+        public List<string>? Certifications { get; set; } = new List<string>();
+
+        // Employee Profile Image stored as BLOB
+        public byte[]? ProfileImage { get; set; }
+
+        // Many-to-Many Relationship with Task
+        public List<UserTask> UserTasks { get; set; }
+
         public ICollection<ActivityLog>? ActivityLogs { get; set; }
         public ICollection<LeaveRequest>? LeaveRequests { get; set; }
         public ICollection<Screenshot>? Screenshots { get; set; }
         public ICollection<_Task>? Tasks { get; set; } 
 
         public ICollection<Notification>? Notifications { get; set; }
+        public List<ProjectMember> ProjectMemberships { get; set; }
 
 
     }
