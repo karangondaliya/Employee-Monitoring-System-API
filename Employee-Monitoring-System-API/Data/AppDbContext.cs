@@ -74,6 +74,14 @@ namespace Employee_Monitoring_System_API.Data
                 .WithMany(t => t.UserTasks)
                 .HasForeignKey(ut => ut.TaskId);
 
+            modelBuilder.HasPostgresExtension("hstore");
+            modelBuilder.Entity<User>()
+                .Property(u => u.TechnicalSkills)
+                .HasColumnType("hstore");
+
+            modelBuilder.Entity<ProjectMember>()
+                .HasKey(pm => new { pm.UserId, pm.ProjectId });
+
             base.OnModelCreating(modelBuilder);
         }
 

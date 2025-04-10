@@ -37,7 +37,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("EmployeePolicy", policy => policy.RequireRole("Employee", "TeamLead", "Admin"));
 });
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -89,6 +88,7 @@ builder.Services.AddScoped<ILeaveRepository, LeaveRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<IAppsettingRepository, AppsettingRepository>();
+builder.Services.AddScoped<IHolidayRepository, HolidayRepository>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.Configure<FormOptions>(options => {
     options.MultipartBodyLengthLimit = 104857600; // 100 MB limit

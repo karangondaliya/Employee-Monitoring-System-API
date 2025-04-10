@@ -13,7 +13,7 @@ namespace Employee_Monitoring_System_API.Repository
             _context = context;
         }
 
-        IEnumerable<Holiday> IHolidayRepository.GetAllHolidays()
+        public IEnumerable<Holiday> GetAllHolidays()
         {
             return _context.Holidays.ToList();
         }
