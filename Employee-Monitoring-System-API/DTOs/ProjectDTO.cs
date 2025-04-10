@@ -13,6 +13,6 @@
         public DateTime? EndDate { get; set; }
         public int? CreatedBy { get; set; }
         public List<UserMiniDTO>? TeamMembers { get; set; }
-
+        public double? Budget { get; set; } // New field for project budget
     }
 }

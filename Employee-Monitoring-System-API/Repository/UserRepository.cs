@@ -31,7 +31,7 @@ namespace Employee_Monitoring_System_API.Repository
             }
             return user;
         }
-        public List<User> GetAllUsers()
+        public IEnumerable<User> GetAllUsers()
         {
             return _context.Users
                 .Include(u => u.UserTasks).ThenInclude(ut => ut.Task)

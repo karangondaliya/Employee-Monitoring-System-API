@@ -53,34 +53,48 @@ namespace Employee_Monitoring_System_API.Controllers
 
         // PUT: api/Projects/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PATCH: api/Projects/5
         [HttpPatch("{id}")]
         [Authorize(Policy = "AdminPolicy")]
         public IActionResult PatchProject(int id, [FromBody] JsonPatchDocument<ProjectDTO> patchDoc)
         {
             if (patchDoc == null)
-            {
                 return BadRequest("Invalid patch document.");
-            }
 
+            // 1) Load the full entity (with members & tasks)
             var project = _pr.GetProject(id);
             if (project == null)
-            {
                 return NotFound("Project not found.");
-            }
 
+            // 2) Map to DTO and apply the JSON Patch
             var projectDTO = _mapper.Map<ProjectDTO>(project);
             patchDoc.ApplyTo(projectDTO, ModelState);
-
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
+
+            // 3) Map patched DTO back onto the entity (updates scalar fields)
+            _mapper.Map(projectDTO, project);
+
+            // 4) Rebuild the many-to-many ProjectMembers from TeamMembers
+            project.ProjectMembers.Clear();
+            if (projectDTO.TeamMembers != null)
+            {
+                foreach (var member in projectDTO.TeamMembers)
+                {
+                    project.ProjectMembers.Add(new ProjectMember
+                    {
+                        UserId = member.Id,
+                        ProjectId = project.ProjectId
+                    });
+                }
             }
 
-            var updatedProject = _mapper.Map<Project>(projectDTO);
-            _pr.Update(updatedProject);
-
-            return Ok(_mapper.Map<ProjectDTO>(updatedProject));
+            // 5) Persist and return the updated DTO
+            var updatedProject = _pr.Update(project);
+            var updatedDto = _mapper.Map<ProjectDTO>(updatedProject);
+            return Ok(updatedDto);
         }
+
 
         // POST: api/Projects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -89,6 +103,10 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<ProjectDTO> PostProject(ProjectDTO projectDTO)
         {
             var project = _mapper.Map<Project>(projectDTO);
+            if(projectDTO.TeamMembers != null)
+            {
+                project.ProjectMembers = projectDTO.TeamMembers.Select(u => new ProjectMember { UserId = u.Id }).ToList();
+            }
             var addedProject = _pr.Add(project);
             var createdProjectDTO = _mapper.Map<ProjectDTO>(addedProject);
 

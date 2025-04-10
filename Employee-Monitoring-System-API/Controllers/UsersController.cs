@@ -153,5 +153,37 @@ namespace Employee_Monitoring_System_API.Controllers
 
             return Ok(new { message = "Password updated successfully" });
         }
+
+        // POST: api/Users/5/upload-image
+        [HttpPost("{id}/upload-image")]
+        [Authorize(Policy = "EmployeePolicy")]
+        public IActionResult UploadProfileImage(int id, IFormFile file)
+        {
+            var user = _userRepository.GetUser(id);
+            if (user == null) return NotFound("User not found.");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            using var ms = new MemoryStream();
+            file.CopyTo(ms);
+            user.ProfileImage = ms.ToArray();
+            _userRepository.Update(user);
+
+            return Ok("Profile image uploaded.");
+        }
+
+        // GET: api/Users/5/profile-image
+        [HttpGet("{id}/profile-image")]
+        [Authorize(Policy = "EmployeePolicy")]
+        public IActionResult GetProfileImage(int id)
+        {
+            var user = _userRepository.GetUser(id);
+            if (user == null) return NotFound("User not found.");
+            if (user.ProfileImage == null) return NotFound("No profile image.");
+
+            return File(user.ProfileImage, "image/png");
+        }
+
     }
 }

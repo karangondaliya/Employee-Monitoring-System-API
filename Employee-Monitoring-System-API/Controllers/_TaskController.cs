@@ -61,16 +61,25 @@ namespace Employee_Monitoring_System_API.Controllers
             if (existingTask == null)
                 return NotFound($"Task with ID {id} not found.");
 
+            // Project to DTO and apply patch
             var taskDTO = _mapper.Map<TaskDTO>(existingTask);
             patchDoc.ApplyTo(taskDTO, ModelState);
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updatedTask = _mapper.Map<_Task>(taskDTO);
-            _tr.Update(updatedTask);
+            // Map patched DTO back to entity (scalars)
+            _mapper.Map(taskDTO, existingTask);
+            // Rebuild many-to-many entries
+            existingTask.UserTasks.Clear();
+            if (taskDTO.AssignedUsers != null)
+            {
+                foreach (var u in taskDTO.AssignedUsers)
+                    existingTask.UserTasks.Add(new UserTask { UserId = u.Id, TaskId = id });
+            }
 
-            return Ok("Task Updated."); // Success - No content returned
+            var updated = _tr.Update(existingTask);
+            var resultDto = _mapper.Map<TaskDTO>(updated);
+            return Ok(resultDto);
         }
 
         // POST: api/_Task
@@ -80,6 +89,12 @@ namespace Employee_Monitoring_System_API.Controllers
         public ActionResult<TaskDTO> Post_Task(TaskDTO taskDTO)
         {
             var task = _mapper.Map<_Task>(taskDTO);
+            if (taskDTO.AssignedUsers != null)
+            {
+                task.UserTasks = taskDTO.AssignedUsers
+                .Select(u => new UserTask { UserId = u.Id })
+                .ToList();
+            }
             var addedTask = _tr.Add(task);
             var CreatedTaskDTO = _mapper.Map<TaskDTO>(addedTask);
             return CreatedAtAction(nameof(Get_Task), new { id = CreatedTaskDTO.TaskId }, CreatedTaskDTO);

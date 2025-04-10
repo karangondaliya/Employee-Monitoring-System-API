@@ -41,7 +41,7 @@ namespace Employee_Monitoring_System_API.Repository
             return _context.Tasks
             .Include(t => t.UserTasks).ThenInclude(ut => ut.User)
             .Include(t => t.Project)
-            .FirstOrDefault(t => t.Id == id);
+            .FirstOrDefault(t => t.TaskId == id);
         }
 
         public IEnumerable<_Task> GetTasks()
